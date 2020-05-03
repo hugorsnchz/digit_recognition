@@ -5,16 +5,20 @@ clc
 %% Datos de trabajo.
 load('Trainnumbers.mat')
 data_original = Trainnumbers.image;
-plot = 5; % Dimensión del subplot
-index = 254; % Índice del plot a mostrar
-PLOTS = 0; % Flag para plots
+plote = 5; % Dimensiï¿½n del subplot
+index = 254; % ï¿½ndice del plot a mostrar
+PLOTS = 1; % Flag para plots
+normalizacion=0; %Aplica normalizaciÃ³n o no.
 
-%% Calcula media y desviación
+%% Calcula media y desviaciï¿½n
 mn = mean(data_original,2);
 stdp = std(data_original')';
-
-for i=1:size(data_original,2)
-    data(:,i)=(data_original(:,i)-mn)./stdp;
+if normalizacion==1
+    for i=1:size(data_original,2)
+        data(:,i)=(data_original(:,i)-mn)./stdp;
+    end
+else
+    data=data_original;
 end
 
 data(isnan(data))=0;
@@ -27,12 +31,12 @@ matrizCov = cov(data');
 diagonal = diagonal./trace(diagonal)*100;
 porcentaje = round(cumsum(flip(diag(diagonal))));
 
-%% Reducción y reconstrucción de los datos
+%% Reducciï¿½n y reconstrucciï¿½n de los datos
 
 if PLOTS == 1
-    figure('units','normalized','outerposition',[0 0 1 1])
+    figure('units','normalized','outerposition',[0 0 1 1]);
     
-    for j=1:plot*plot-1
+    for j=1:plote*plote-1
         
         ncompca=251-(10*j);
         
@@ -43,19 +47,67 @@ if PLOTS == 1
         reducedData=(data'*transMatRed')';
         reconstructedData=(reducedData'*transMatRed)';
         
-        for i=1:size(reconstructedData,2)
-            reconstructedData(:,i)=reconstructedData(:,i).*stdp + mn;
+        if normalizacion==1
+            for i=1:size(reconstructedData,2)
+                reconstructedData(:,i)=reconstructedData(:,i).*stdp + mn;
+            end
         end
         
-        subplot(plot,plot,j+1), digitdisp(reconstructedData(:,index));
-        str = sprintf('Dimensión: %i, %i%%', ncompca,porcentaje(ncompca));
+        subplot(plote,plote,j+1), digitdisp(reconstructedData(:,index));
+        str = sprintf('Dimensiï¿½n: %i, %i%%', ncompca,porcentaje(ncompca));
         title(str)
         clear transMatRed
+        
     end
     
-    subplot(plot,plot,1), digitdisp(data_original(:,index));
+    subplot(plote,plote,1), digitdisp(data_original(:,index));
     title('original')
 end
+
+%% Grafica el MSE
+if PLOTS == 1
+    contador=1;
+    
+    for j=1:10:784
+        
+        ncompca=j;
+        vecncompca(1,contador)=ncompca;
+        
+        for i=1:ncompca
+            transMatRed(i,:)=transMat(:,784+1-i)';
+        end
+        
+        reducedData=(data'*transMatRed')';
+        reconstructedData=(reducedData'*transMatRed)';
+        
+        if normalizacion==1
+            for i=1:size(reconstructedData,2)
+                reconstructedData(:,i)=reconstructedData(:,i).*stdp + mn;
+            end
+        end
+        
+        clear transMatRed
+        
+        
+        MSEPCA=784*mse(data_original-reconstructedData);
+        vecMSEPCA(1,contador)=MSEPCA;
+        contador=contador+1;
+        
+    end
+end
+
+figure;
+plot(vecncompca,vecMSEPCA);
+
+if normalizacion==1  
+    title("MSE vs dimension (Normalized)");
+else
+    title("MSE vs dimension (Not normalized)");
+end
+
+xlabel("Dimension");
+ylabel("MSE");
+
 %% Para guardar variable
 ncompca=200;
 
