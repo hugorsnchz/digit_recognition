@@ -1,36 +1,38 @@
 function [reducedData] = fisherdiscriminant(datos,clases)
-d=784;
+clases=clases';
 vecclases=unique(clases');
 numvecclases = 10;
 dimensionreduccion=9;
 
 
 mediaclase = cell(1,numvecclases);
-CovVal = cell(1,numvecclases);
-sizeC=zeros(1,numvecclases);
+Cova = cell(1,numvecclases);
+tamanoclase=zeros(1,numvecclases);
 
-i=1;
+
 %Para cada clase:
 for j=1:numvecclases
     claseactual=vecclases(1,j);
-    Xc=datos(:,clases==claseactual);
-    mediaclase(i) = {mean(Xc,2)};
-    CovVal(i) = {cov(Xc')};
-    sizeC(i)=size(Xc,2);
-    i=i+1;
+    datosclases=datos(:,clases==claseactual);
+    mediaclase(j) = {mean(datosclases,2)};
+    tamanoclase(j)=size(datosclases,2);
+    Cova(j) = {cov(datosclases')};
+    
 end
 
 mediaglob = mean(datos,2);
-SB = zeros(d,d);
-SW = zeros(d,d);
+SB = zeros(784,784);
+SW = zeros(784,784);
 
 for i = 1:numvecclases
-    SB = SB + sizeC(i).*(mediaclase{i}-mediaglob)*(mediaclase{i}-mediaglob)';
-    SW = SW+CovVal{i};
+    
+    SW = SW+Cova{i};
+    SB = SB + tamanoclase(i).*(mediaclase{i}-mediaglob)*(mediaclase{i}-mediaglob)';
+    
 end
 
-invSw_by_SB = pinv(SW) * SB;
-[V,D] = eig(invSw_by_SB);
+Mat = pinv(SW) * SB;
+[V,D] = eig(Mat);
 diagonal=diag(D);
 
 [ordenados,indices]=sort(diagonal,'descend');
