@@ -1,18 +1,18 @@
 clear all
 close all
 
-figure(); hold on
 cont=1;
+resultados = struct;
 
-for h=50:10:300
+for bucle=2:2:200
     %% PARÁMETROS
     TRAIN = 1;
     nombre = 'netMLP.mat'; %en el caso de TRAIN = 0
     
     TEST = 1;
-    batch = 8000;
-    capas = [100,50];
-    pca = h;
+    batch = 9000;
+    capas = [bucle];
+    pca = 150;
     
     %% DATA
     
@@ -33,7 +33,7 @@ for h=50:10:300
     %% ENTRENAMIENTO
     
     if TRAIN==1
-        funcion = 1; % Elección de la función de 'fit'
+        funcion = 3; % Elección de la función de 'fit'
         switch funcion
             case 1
                 net=feedforwardnet(capas,'trainscg');
@@ -45,16 +45,18 @@ for h=50:10:300
                 
                 net=patternnet(capas,entrenamiento,performance);
                 
-                net.trainParam.epochs = 10000; %1000
+                net.trainParam.epochs = 1000; %1000
                 net.trainParam.min_grad = 1e-10; %1e-6
-                net.trainParam.max_fail = 50; %6
+                net.trainParam.max_fail = 6; %6
                 net.trainParam.sigma = 5.0e-5; %5.0e-5
         end
         
         % set_index = round(10000 .* rand(batch,1))'; % Random set/batch
         set_index = 1:batch;
         
+        tic
         [net,tr]=train(net,Trainnumbers.reduced(:,set_index),labels(:,set_index),'useGPU','yes','showResources','no');
+        tiempo = toc;
         
     else
         load(nombre)
@@ -86,19 +88,26 @@ for h=50:10:300
     end
     acierto=bien/length(output);
     
-    s0='C:\Users\hugor\Google Drive\Universidad\Máster en Automática y Robótica\Inteligencia Artificial Aplicada IAA\Digits\digit_recognition\Nets\';
-    s1=strcat('_(',num2str(capas(1)),'_',num2str(capas(2)),')');
-    s2=strcat('_',num2str(round(acierto,3)),'%');
-    s3=strcat('_',num2str(batch));
+%     s0='C:\Users\hugor\Google Drive\Universidad\Máster en Automática y Robótica\Inteligencia Artificial Aplicada IAA\Digits\digit_recognition\Nets\';
+%     s1=strcat('_(',num2str(capas(1)),'_',num2str(capas(2)),')');
+%     s2=strcat('_',num2str(round(acierto,3)),'%');
+%     s3=strcat('_',num2str(batch));
+%     
+%     save(strcat(s0,'MLP',s2,'_',num2str(pca),s1,s3,'.mat'),'net');
     
-    save(strcat(s0,'MLP',s2,'_',num2str(pca),s1,s3,'.mat'),'net');
+    resultados.tiempo(cont)=tiempo;
+    resultados.batch(cont)=batch;
+    resultados.capas(cont)=capas;
+    resultados.acierto(cont)=acierto;
+    %resultados.net(cont)=net;
+    resultados.tr(cont)=tr;
+    %resultados.onehot(cont)=output_onehot;
+    resultados.output(cont,:)=output;
+    resultados.pca(cont)=pca;
     
-    pca_(cont)=pca;
-    acierto_(cont)=acierto;
-    disp(pca)
+    clearvars -except resultados cont
+    
     cont=cont+1;
-    clearvars -except acierto_ pca_ cont h
+    disp(cont);
 end
-plot(pca,acierto_);
-plot(pca,acierto_,'k.');
-%clearvars -except acierto output output_onehot Trainnumbers
+
