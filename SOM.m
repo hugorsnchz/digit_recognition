@@ -3,16 +3,26 @@ clc
 close all
 clear all
 
-load('Trainnumbers.mat');
-if exist('reducedData','var') == 0
-    load('reducedData.mat')
+pca=100;
+
+load('Trainnumbers.mat')
+labels=zeros(10,length(Trainnumbers.label));
+for i=1:length(Trainnumbers.label) % Conversion to one-hot vector labels.
+    if Trainnumbers.label(i)==0
+        labels(10,i)=1;
+    else
+        labels(Trainnumbers.label(i),i)=1;
+    end
 end
-Trainnumbers.image=reducedData;
+
+[reducedData,porcentaje]=function_pca(Trainnumbers,pca);
+
+Trainnumbers.reduced=reducedData;
 
 %% SOM, construcción y entrenamiento
-inputs = Trainnumbers.image();
-dimension1 = 50;
-dimension2 = 50;
+inputs = Trainnumbers.reduced();
+dimension1 = 10;
+dimension2 = 10;
 net = selforgmap([dimension1 dimension2]);
 [net,tr] = train(net,inputs);
 %load('netSOM.mat','net')
@@ -51,7 +61,7 @@ end
 fprintf('Error de train de %f porciento. \n',100*error_train/size(inputs,2))
  
 %% Clasificación de test y error de test
-outputs = net(Trainnumbers.image);
+outputs = net(Trainnumbers.reduced);
 classes_test = vec2ind(outputs);
 error_test=0;
 for i=1:length(Trainnumbers.label)
@@ -60,6 +70,12 @@ for i=1:length(Trainnumbers.label)
     end
 end
 fprintf('Error de test de %f porciento. \n',100*error_test/length(Trainnumbers.label))
+
+%% Confusion matrix
+figure()
+plotconfusion(Trainnumbers.label,correspondencia(clase_SOM))
+
+
 
 %% Plots
 % Uncomment these lines to enable various plots.
