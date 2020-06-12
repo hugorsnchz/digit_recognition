@@ -4,9 +4,12 @@ data_original = Trainnumbers.image;
 mn = mean(data_original,2);
 stdp = std(data_original')';
 
-for i=1:size(data_original,2)
-    data(:,i)=(data_original(:,i)-mn)./stdp;
-end
+%para normalizar
+% for i=1:size(data_original,2)
+%     data(:,i)=(data_original(:,i)-mn)./stdp;
+% end
+
+data=data_original; %
 
 data(isnan(data))=0;
 matrizCov = cov(data');
