@@ -1,27 +1,28 @@
 %autoencoder
-%Primero se reduce con un PCA
+%Primero se reduce con un PCA a dimension 300
 close all
 clear all
 clc
-tic
-%% Datos de trabajo.
+
+% Datos de trabajo.
 load('Trainnumbers.mat')
 load('autoenc.mat')
 data_original = Trainnumbers.image;
 data=data_original;
 figure;
 digitdisp(data(:,4));
+title('Original');
 
 
-%% Calcula PCA
+% Calcula PCA
 matrizCov = cov(data');
 [transMat,diagonal]=eig(matrizCov);
 
-%% Calcula pesos de las componentes principales
+% Calcula pesos de las componentes principales
 diagonal = diagonal./trace(diagonal)*100;
 porcentaje = round(cumsum(flip(diag(diagonal))));
 
-%% Reducciï¿½n y reconstrucciï¿½n de los datos
+% Reduccion de los datos
 ncompca=300;
 
 for i=1:ncompca
@@ -30,15 +31,20 @@ end
 
 reducedData=(data'*transMatRed')';
 
-reconstructedData1=(reducedData'*transMatRed)';
-figure;
-digitdisp(reconstructedData1(:,4));
-mseError = mse(data-reconstructedData1)
-%autoenc = trainAutoencoder(reducedData);
+%Entrenamiento de la red
+% hiddenSize = 55;
+% autoenc = trainAutoencoder(reducedData,hiddenSize);
 
-reconstructed = predict(autoenc,reducedData);
+%aqui se codifican los datos, reduciendo la dimensión a 55
+Datosreducidosencoder = encode(autoenc,reducedData);
 
-reconstructedData=(reconstructed'*transMatRed)';
+R = decode(autoenc,Datosreducidosencoder);
+
+%se reconstruye el pca
+reconstructedData=(R'*transMatRed)';
+
 figure;
 digitdisp(reconstructedData(:,4));
+title('PCA(300) + Autoenc (55)');
+disp('MSE PCA(300) + Autoenc (55)');
 mseError = mse(data-reconstructedData)
