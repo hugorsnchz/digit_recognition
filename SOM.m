@@ -20,16 +20,17 @@ load('Trainnumbers.mat')
 % end
 
 [reducedData,porcentaje]=function_pca(Trainnumbers,pca);
-
 Trainnumbers.reduced=reducedData;
 
 %% SOM, construcción y entrenamiento
 
 inputs_train = Trainnumbers.reduced(:,1:batch);
-dimension1 = 20;
-dimension2 = 20;
+dimension1 = 25;
+dimension2 = 25;
 net = selforgmap([dimension1 dimension2]);
+tic
 [net,tr] = train(net,inputs_train);
+toc
 %load('netSOM.mat','net')
 outputs_train = net(inputs_train);
 clase_SOM = vec2ind(outputs_train);
@@ -53,12 +54,8 @@ for i=1:(dimension1*dimension2)
 end
 
 correspondencia(correspondencia==10)=0;
-
-%% Plot de correspondencia por colores
-
 correspondencia_matrix = reshape(correspondencia,[dimension1,dimension2]);
-% image(correspondecia_matrix,'CDataMapping','scaled')
-% colormap(hsv); colorbar;
+
 
 %% Número de errores train
 

@@ -4,15 +4,16 @@ close all
 cont=1;
 resultados = struct;
 
-for bucle=2:2:200
+for bucle=1:20
     %% PARÁMETROS
-    TRAIN = 1;
-    nombre = 'netMLP.mat'; %en el caso de TRAIN = 0
     
+    TRAIN = 1;
     TEST = 1;
+    
+    nombre = 'netMLP.mat'; %en el caso de TRAIN = 0
     batch = 9000;
-    capas = [bucle];
-    pca = 150;
+    capas = [100 50];
+    pca = 200;
     
     %% DATA
     
@@ -27,7 +28,6 @@ for bucle=2:2:200
     end
     
     [reducedData,porcentaje]=function_pca(Trainnumbers,pca);
-    
     Trainnumbers.reduced=reducedData;
     
     %% ENTRENAMIENTO
@@ -45,13 +45,12 @@ for bucle=2:2:200
                 
                 net=patternnet(capas,entrenamiento,performance);
                 
-                net.trainParam.epochs = 1000; %1000
+                net.trainParam.epochs = 10000; %1000
                 net.trainParam.min_grad = 1e-10; %1e-6
-                net.trainParam.max_fail = 6; %6
+                net.trainParam.max_fail = 100; %6
                 net.trainParam.sigma = 5.0e-5; %5.0e-5
         end
         
-        % set_index = round(10000 .* rand(batch,1))'; % Random set/batch
         set_index = 1:batch;
         
         tic
@@ -67,7 +66,6 @@ for bucle=2:2:200
     if TEST==1
         
         output_onehot=sim(net,Trainnumbers.reduced(:,batch+1:10000),'useGPU','yes','showResources','no');
-        %output_onehot=sim(net,Trainnumbers.reduced,'useGPU','yes','showResources','yes');
         
         for i=1:size(output_onehot,2) % Selection of most activated output.
             [M,I] = max(output_onehot(:,i));
@@ -82,7 +80,6 @@ for bucle=2:2:200
     bien=0;
     for i=1:length(output) % Comporbación de aciertos.
         if  output(i)==Trainnumbers.label(batch+i)
-            %if  output(i)==Trainnumbers.label(i)
             bien=bien+1;
         end
     end
@@ -93,21 +90,19 @@ for bucle=2:2:200
 %     s2=strcat('_',num2str(round(acierto,3)),'%');
 %     s3=strcat('_',num2str(batch));
 %     
-%     save(strcat(s0,'MLP',s2,'_',num2str(pca),s1,s3,'.mat'),'net');
+    save(strcat('MLP','_',num2str(bucle),'.mat'),'net');
     
     resultados.tiempo(cont)=tiempo;
-    resultados.batch(cont)=batch;
-    resultados.capas(cont)=capas;
     resultados.acierto(cont)=acierto;
-    %resultados.net(cont)=net;
     resultados.tr(cont)=tr;
-    %resultados.onehot(cont)=output_onehot;
     resultados.output(cont,:)=output;
     resultados.pca(cont)=pca;
     
     clearvars -except resultados cont
     
-    cont=cont+1;
     disp(cont);
+    cont=cont+1;
+   
 end
 
+disp(max(resultados.acierto));
