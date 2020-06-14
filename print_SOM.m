@@ -15,7 +15,7 @@ for i=1:b
         cont=cont+1;
     end
 end
-set(h1,'position',[500,200,700,700]);
+set(h1,'position',[100,60,900,900]);
 end
 
 

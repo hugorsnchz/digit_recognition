@@ -3,7 +3,7 @@ clc
 clear all
 close all
 
-pca=150;
+pca=200;
 batch=9000;
 
 %% Load y conversión a one hot vector labels
@@ -26,8 +26,8 @@ Trainnumbers.reduced=reducedData;
 %% SOM, construcción y entrenamiento
 
 inputs_train = Trainnumbers.reduced(:,1:batch);
-dimension1 = 5;
-dimension2 = 5;
+dimension1 = 20;
+dimension2 = 20;
 net = selforgmap([dimension1 dimension2]);
 [net,tr] = train(net,inputs_train);
 %load('netSOM.mat','net')
@@ -76,7 +76,7 @@ output_test = net(Trainnumbers.reduced(:,batch+1:10000));
 clase_SOM_test = vec2ind(output_test);
 error_test=0;
 for i=1:length(clase_SOM_test)
-    if correspondencia(clase_SOM_test(i))~=Trainnumbers.label(:,batch+1:10000)
+    if correspondencia(clase_SOM_test(i))~=Trainnumbers.label(batch+i)
         error_test=error_test+1;
     end
 end
@@ -84,9 +84,13 @@ end
 %% Confusion matrix
 
 figure()
-confusionchart(confusionmat(double(Trainnumbers.label(:,1:batch)),double(correspondencia(clase_SOM))));
+cm1=confusionchart(confusionmat(Trainnumbers.label(:,1:batch),correspondencia(clase_SOM)),{'0','1','2','3','4','5','6','7','8','9'});
+cm1.RowSummary = 'row-normalized';
+cm1.ColumnSummary = 'column-normalized';
 figure()
-confusionchart(confusionmat(double(Trainnumbers.label(:,batch+1:10000)),double(correspondencia(clase_SOM_test))));
+cm2=confusionchart(confusionmat(Trainnumbers.label(:,batch+1:10000),correspondencia(clase_SOM_test)),{'0','1','2','3','4','5','6','7','8','9'});
+cm2.RowSummary = 'row-normalized';
+cm2.ColumnSummary = 'column-normalized';
 
 save('netSOM.mat','net');
 
@@ -96,6 +100,7 @@ print_SOM(dimension1,clase_SOM,Trainnumbers);
 disp(flip(correspondencia_matrix'));
 fprintf('Error de test de %f porciento. \n',100*error_test/length(clase_SOM_test));
 fprintf('Error de train de %f porciento. \n',100*error_train/length(clase_SOM));
+
 
 %% Plots
 
