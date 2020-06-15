@@ -10,5 +10,5 @@ flanders=3;
 Test_numbers.reduced = (Test_numbers.image'*transMatRed')';
 
 knn=fitcknn(Trainnumbers.reduced',Trainnumbers.label,'NumNeighbors',flanders);
-output=knn.predict(Test_numbers.reduced');
+output=(knn.predict(Test_numbers.reduced'))';
 dataset=Test_numbers;

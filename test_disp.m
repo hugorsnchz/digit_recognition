@@ -1,5 +1,5 @@
 plote = 5;
-d = 8000;
+d = 4000;
 
 figure('units','normalized','outerposition',[0 0 1 1]);
 
