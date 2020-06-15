@@ -1,9 +1,10 @@
-plote = 5;
-d = 8000;
+n = 6*5;
+plote = sqrt(n);
+d = 9500;
 
 figure('units','normalized','outerposition',[0 0 1 1]);
 
-for i=1:plote*plote
+for i=1:n
     
 subplot(plote,plote,i), digitdisp(dataset.image(:,i+d));
 str = sprintf('%i',output(i+d));

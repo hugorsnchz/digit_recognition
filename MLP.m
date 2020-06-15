@@ -4,7 +4,7 @@ close all
 cont=1;
 resultados = struct;
 
-for bucle=1:20
+for bucle=1:5
     %% PARÁMETROS
     
     TRAIN = 1;
@@ -12,7 +12,7 @@ for bucle=1:20
     
     nombre = 'netMLP.mat'; %en el caso de TRAIN = 0
     batch = 9000;
-    capas = [100 50];
+    capas = [150 50];
     pca = 200;
     
     %% DATA
@@ -90,7 +90,7 @@ for bucle=1:20
 %     s2=strcat('_',num2str(round(acierto,3)),'%');
 %     s3=strcat('_',num2str(batch));
 %     
-    save(strcat('MLP','_',num2str(bucle),'.mat'),'net');
+    save(strcat('MLP2','_',num2str(bucle),'.mat'),'net');
     
     resultados.tiempo(cont)=tiempo;
     resultados.acierto(cont)=acierto;

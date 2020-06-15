@@ -3,7 +3,7 @@ close all
 
 load('SOM_final.mat')
 load('correspondencia_SOM_final.mat')
-flag = 0; %true si testnumbers, false si trainnumbers
+flag = 1; %true si testnumbers, false si trainnumbers
 
 if flag
     load('Test_numbers_HW1.mat');
