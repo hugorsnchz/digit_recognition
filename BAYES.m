@@ -11,8 +11,8 @@ load('Trainnumbers.mat')
 
 [Trainnumbers.reduced, porcentaje]=function_pca(Trainnumbers,ncompca);
 
-tipo='linear';
-%tipo='quadratic';
+%tipo='linear';
+tipo='quadratic';
 
 output=classify(Trainnumbers.reduced(:,batch+1:10000)',Trainnumbers.reduced(:,1:batch)',Trainnumbers.label(:,1:batch),tipo);
 acierto=1-length(find(output'~=Trainnumbers.label(:,batch+1:10000)))/length(Trainnumbers.label(:,batch+1:10000));
